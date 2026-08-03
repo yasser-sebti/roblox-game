@@ -4,8 +4,8 @@ local StarterPlayer = game:GetService("StarterPlayer")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- Slightly softer gravity for a restrained, Hello Neighbor-like jump arc.
-Workspace.Gravity = 176
+-- Softer gravity for a lighter, smoother jump arc.
+Workspace.Gravity = 135
 
 -- Automatically convert Dummy model to StarterCharacter if present
 local function setupDummyCharacter()
