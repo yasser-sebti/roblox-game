@@ -4,8 +4,8 @@ local StarterPlayer = game:GetService("StarterPlayer")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- Softer gravity for a lighter, smoother jump arc.
-Workspace.Gravity = 135
+-- Softer gravity for a lighter, significantly slower fall speed.
+Workspace.Gravity = 95
 
 -- Automatically convert Dummy model to StarterCharacter if present
 local function setupDummyCharacter()

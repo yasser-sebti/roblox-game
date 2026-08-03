@@ -483,6 +483,29 @@ function ControllerModule.new(player: Player, character: Model, config: Locomoti
 		track:Stop(0.05)
 	end))
 
+	-- Enforce a small jump delay (0.40s cooldown) between jumps
+	local JUMP_COOLDOWN = 0.40
+	local lastJumpTime = 0
+	table.insert(controller.Connections, UserInputService.JumpRequest:Connect(function()
+		local now = os.clock()
+		if now - lastJumpTime < JUMP_COOLDOWN then
+			rig.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+		else
+			rig.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+		end
+	end))
+	table.insert(controller.Connections, rig.Humanoid.StateChanged:Connect(function(_oldState, newState)
+		if newState == Enum.HumanoidStateType.Jumping then
+			lastJumpTime = os.clock()
+			rig.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+			task.delay(JUMP_COOLDOWN, function()
+				if not controller.Destroyed and rig.Humanoid and rig.Humanoid.Parent then
+					rig.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+				end
+			end)
+		end
+	end))
+
 	table.insert(controller.Connections, RunService.PreSimulation:Connect(function(deltaTime: number)
 		controller:_render(deltaTime)
 	end))
@@ -744,6 +767,12 @@ function ControllerClass._render(self: Controller, rawDeltaTime: number)
 		config.FallTransitionFrequency,
 		deltaTime
 	)
+
+	-- Significantly reduce falling speed by capping maximum downward terminal velocity
+	local currentLinearVel = rig.RootPart.AssemblyLinearVelocity
+	if currentLinearVel.Y < -18 then
+		rig.RootPart.AssemblyLinearVelocity = Vector3.new(currentLinearVel.X, -18, currentLinearVel.Z)
+	end
 	local firstPersonEnabled = self.Player:GetAttribute("FirstPersonEnabled") ~= false
 	local requestedMove = horizontal(humanoid.MoveDirection)
 	local requestMagnitude = math.clamp(requestedMove.Magnitude, 0, 1)
