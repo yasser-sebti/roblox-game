@@ -53,12 +53,18 @@ local function getRequiredPart(character: Model, name: string): BasePart?
 	return nil
 end
 
-local function isFirstPersonHiddenPart(part: BasePart): boolean
+local function isFirstPersonHiddenPart(part: BasePart, headPart: BasePart?): boolean
+	if headPart and (part == headPart or part:IsDescendantOf(headPart)) then
+		return true
+	end
 	local lowerName = string.lower(part.Name)
 	if lowerName == "head" or string.find(lowerName, "neck", 1, true) then
 		return true
 	end
-	return part:FindFirstAncestorOfClass("Accessory") ~= nil
+	if part.Parent and (string.lower(part.Parent.Name) == "head" or string.find(string.lower(part.Parent.Name), "neck", 1, true)) then
+		return true
+	end
+	return part:FindFirstAncestorOfClass("Accessory") ~= nil or part:FindFirstAncestorOfClass("Accoutrement") ~= nil
 end
 
 local function findMotor(motorsByName: { [string]: Motor6D }, ...: string): Motor6D?
@@ -71,12 +77,12 @@ local function findMotor(motorsByName: { [string]: Motor6D }, ...: string): Moto
 	return nil
 end
 
-function RigModule.applyFirstPersonVisibility(instance: Instance, firstPersonEnabled: boolean?)
+function RigModule.applyFirstPersonVisibility(instance: Instance, firstPersonEnabled: boolean?, headPart: BasePart?)
 	if not instance:IsA("BasePart") then
 		return
 	end
 
-	local shouldHide = firstPersonEnabled ~= false and isFirstPersonHiddenPart(instance)
+	local shouldHide = firstPersonEnabled ~= false and isFirstPersonHiddenPart(instance, headPart)
 	instance.LocalTransparencyModifier = if shouldHide then 1 else 0
 end
 
@@ -123,7 +129,7 @@ function RigModule.create(character: Model): (Rig?, string?)
 			restTransforms[descendant] = CFrame.identity
 		elseif descendant:IsA("BasePart") then
 			table.insert(bodyParts, descendant)
-			RigModule.applyFirstPersonVisibility(descendant)
+			RigModule.applyFirstPersonVisibility(descendant, nil, head)
 		end
 	end
 

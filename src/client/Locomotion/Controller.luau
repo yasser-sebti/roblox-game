@@ -435,7 +435,7 @@ function ControllerModule.new(player: Player, character: Model, config: Locomoti
 	player:SetAttribute("CrouchBlocked", false)
 
 	for _, bodyPart in rig.BodyParts do
-		RigModule.applyFirstPersonVisibility(bodyPart, player:GetAttribute("FirstPersonEnabled") ~= false)
+		RigModule.applyFirstPersonVisibility(bodyPart, player:GetAttribute("FirstPersonEnabled") ~= false, rig.Head)
 	end
 
 	table.insert(controller.Connections, character.DescendantAdded:Connect(function(descendant: Instance)
@@ -449,13 +449,15 @@ function ControllerModule.new(player: Player, character: Model, config: Locomoti
 		if descendant:IsA("BasePart") then
 			table.insert(rig.BodyParts, descendant)
 		end
-		RigModule.applyFirstPersonVisibility(descendant, player:GetAttribute("FirstPersonEnabled") ~= false)
+		RigModule.applyFirstPersonVisibility(descendant, player:GetAttribute("FirstPersonEnabled") ~= false, rig.Head)
 	end))
 	table.insert(controller.Connections, player:GetAttributeChangedSignal("FirstPersonEnabled"):Connect(function()
 		local firstPersonEnabled = player:GetAttribute("FirstPersonEnabled") ~= false
 		controller.CameraRotationInitialized = false
-		for _, bodyPart in rig.BodyParts do
-			RigModule.applyFirstPersonVisibility(bodyPart, firstPersonEnabled)
+		for _, descendant in character:GetDescendants() do
+			if descendant:IsA("BasePart") then
+				RigModule.applyFirstPersonVisibility(descendant, firstPersonEnabled, rig.Head)
+			end
 		end
 	end))
 	table.insert(controller.Connections, UserInputService.InputChanged:Connect(function(input: InputObject)
@@ -554,9 +556,13 @@ function ControllerClass._renderVisibility(self: Controller, rawDeltaTime: numbe
 	-- every frame in first person. This runs afterwards and keeps the R15 body
 	-- visible while still hiding only the head and accessories inside the camera.
 	local firstPersonEnabled = self.Player:GetAttribute("FirstPersonEnabled") ~= false
-	for _, bodyPart in self.Rig.BodyParts do
-		if bodyPart.Parent then
-			RigModule.applyFirstPersonVisibility(bodyPart, firstPersonEnabled)
+	local character = self.Rig.Character
+	local head = self.Rig.Head
+	if character and character.Parent then
+		for _, descendant in character:GetDescendants() do
+			if descendant:IsA("BasePart") then
+				RigModule.applyFirstPersonVisibility(descendant, firstPersonEnabled, head)
+			end
 		end
 	end
 
