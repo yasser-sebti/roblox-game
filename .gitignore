@@ -1,0 +1,14 @@
+# Project place file
+/MyRobloxGame.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+sourcemap.json
+
+# Local Studio pose-tuner exports (never ship with the game)
+/pose-exports/
+
+# Local verification builds
+/build/

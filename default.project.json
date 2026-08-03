@@ -1,0 +1,38 @@
+{
+  "name": "MyRobloxGame",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$path": "src/server"
+    },
+    "ReplicatedStorage": {
+      "$ignoreUnknownInstances": true,
+      "GameSettings": {
+        "$className": "Folder",
+        "ShadersEnabled": {
+          "$className": "BoolValue",
+          "$properties": {
+            "Value": true
+          }
+        },
+        "NightEnabled": {
+          "$className": "BoolValue",
+          "$properties": {
+            "Value": true
+          }
+        }
+      },
+      "Shared": {
+        "$path": "src/shared"
+      },
+      "Assets": {
+        "$path": "IDE Sharing files"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "$path": "src/client"
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "R15PoseTunerPlugin",
+  "tree": {
+    "$className": "Folder",
+    "Main": {
+      "$path": "tools/PoseTunerPlugin/Main.server.luau"
+    },
+    "Modules": {
+      "$path": "tools/PoseTunerPlugin/Modules"
+    },
+    "FirstPersonViewConfig": {
+      "$path": "src/shared/FirstPersonViewConfig.luau"
+    }
+  }
+}
